@@ -54,6 +54,9 @@ import com.aspose.barcode.cloud.api.GenerateApi
 import com.aspose.barcode.cloud.api.ScanApi
 import com.aspose.barcode.cloud.model.BarcodeImageFormat
 import com.aspose.barcode.cloud.model.EncodeBarcodeType
+import com.aspose.barcode.cloud.model.QREncodeMode
+import com.aspose.barcode.cloud.model.QRErrorLevel
+import com.aspose.barcode.cloud.model.QRVersion
 import com.aspose.barcode.cloud.requests.GenerateRequestWrapper
 import com.aspose.barcode.cloud.requests.ScanMultipartRequestWrapper
 import com.google.android.material.snackbar.Snackbar
@@ -254,6 +257,13 @@ class MainActivity : AppCompatActivity() {
         genRequest.imageFormat = BarcodeImageFormat.PNG
         genRequest.imageHeight = barcodeImgView.measuredHeight.toFloat()
         genRequest.imageWidth = barcodeImgView.measuredWidth.toFloat()
+
+        if (type == EncodeBarcodeType.QR) {
+            genRequest.qrEncodeMode = QREncodeMode.AUTO
+            genRequest.qrErrorLevel = QRErrorLevel.LEVEL_M
+            genRequest.qrVersion = QRVersion.AUTO
+            genRequest.qrAspectRatio = 0.75f
+        }
 
         Thread {
             try {
