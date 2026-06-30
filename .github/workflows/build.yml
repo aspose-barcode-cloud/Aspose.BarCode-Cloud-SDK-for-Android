@@ -25,3 +25,7 @@ jobs:
           fastlane-env: "release"
           ruby-version: "3.3"
           bundler-version: "2.4.22"
+          # Pin fastlane >= 2.236.0, which adds multi_json as a direct dep.
+          # The action's default (2.213.0) crashes with
+          # "multi_json is not part of the bundle" on load.
+          fastlane-version: "2.236.1"
