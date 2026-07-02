@@ -83,11 +83,15 @@ val client = ApiClient("MY_CLIENT_ID", "MY_CLIENT_SECRET")
 val generateApi = GenerateApi(client)
 
 val request = GenerateRequestWrapper(EncodeBarcodeType.QR, "text example")
-request.imageFormat = BarcodeImageFormat.PNG
-request.qrEncodeMode = QREncodeMode.AUTO
-request.qrErrorLevel = QRErrorLevel.LEVEL_M
-request.qrVersion = QRVersion.AUTO
-request.qrAspectRatio = 0.75f
+request.barcodeImageParams = BarcodeImageParams().apply {
+    imageFormat = BarcodeImageFormat.PNG
+}
+request.qrParams = QrParams().apply {
+    qrEncodeMode = QREncodeMode.AUTO
+    qrErrorLevel = QRErrorLevel.LEVEL_M
+    qrVersion = QRVersion.AUTO
+    qrAspectRatio = 0.75f
+}
 
 val result = generateApi.generate(request)
 println(result?.absolutePath)
