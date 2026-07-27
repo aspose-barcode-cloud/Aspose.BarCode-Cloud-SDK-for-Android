@@ -73,10 +73,18 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.floor
+import kotlin.math.min
 import androidx.core.graphics.scale
 
 class MainActivity : AppCompatActivity() {
     companion object {
+        /** Barcode types whose modules are square and get distorted by a non-square image. */
+        private val SQUARE_BARCODE_TYPES = setOf(
+            EncodeBarcodeType.QR,
+            EncodeBarcodeType.GS1_QR,
+            EncodeBarcodeType.MICRO_QR,
+        )
+
         private fun imageSize(width: Int, height: Int, maxSize: Int = 384): Size {
             val ratio = width.toFloat() / height
             if (ratio > 1) {
@@ -264,11 +272,7 @@ class MainActivity : AppCompatActivity() {
         val type = EncodeBarcodeType.fromValue(barcodeTypeSpinner.selectedItem.toString())
 
         val genRequest = GenerateRequestWrapper(type, barcodeTextEdit.text.toString())
-        genRequest.barcodeImageParams = BarcodeImageParams().apply {
-            imageFormat = BarcodeImageFormat.PNG
-            imageHeight = barcodeImgView.measuredHeight.toFloat()
-            imageWidth = barcodeImgView.measuredWidth.toFloat()
-        }
+        genRequest.barcodeImageParams = imageParams(type)
 
         applyEncodeParams(genRequest, type)
 
@@ -293,6 +297,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }.start()
+    }
+
+    /**
+     * The API stretches the barcode to fill the requested image, so a square symbology
+     * has to be rendered into a square image to keep its modules square.
+     */
+    private fun imageParams(type: EncodeBarcodeType) = BarcodeImageParams().apply {
+        imageFormat = BarcodeImageFormat.PNG
+
+        if (type in SQUARE_BARCODE_TYPES) {
+            val side = min(barcodeImgView.measuredWidth, barcodeImgView.measuredHeight).toFloat()
+            imageHeight = side
+            imageWidth = side
+        } else {
+            imageHeight = barcodeImgView.measuredHeight.toFloat()
+            imageWidth = barcodeImgView.measuredWidth.toFloat()
+        }
     }
 
     /**
@@ -332,7 +353,8 @@ class MainActivity : AppCompatActivity() {
         qrErrorLevel = QRErrorLevel.LEVEL_M
         qrVersion = QRVersion.AUTO
         qrECIEncoding = ECIEncodings.UTF8
-        qrAspectRatio = 0.75f
+        // 1.0 keeps the modules square, lower values flatten the barcode.
+        qrAspectRatio = 1.0f
     }
 
     /**
