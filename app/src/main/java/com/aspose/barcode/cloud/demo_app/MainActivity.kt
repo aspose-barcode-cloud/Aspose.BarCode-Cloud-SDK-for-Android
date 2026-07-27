@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
             val smallerBmp = reduceBitmapSize(image)
 
             barcodeImgView.setImageBitmap(smallerBmp)
-            startRecognizeAnimation()
+            startProgressAnimation()
 
             val tmpFile = File.createTempFile("barcode", null)
 
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity() {
                     val recognized = scanApi.scanMultipart(apiRequest)
 
                     runOnUiThread {
-                        stopRecognizeAnimation()
+                        stopProgressAnimation()
                         if (recognized.barcodes.isEmpty()) {
                             barcodeTextEdit.setText("")
                             showErrorMessage("No barcode detected")
@@ -238,7 +238,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 } catch (e: ApiException) {
                     runOnUiThread {
-                        stopRecognizeAnimation()
+                        stopProgressAnimation()
 
                         var message = e.message + ": " + e.details
                         if (e.httpCode == 0) {
@@ -248,7 +248,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     runOnUiThread {
-                        stopRecognizeAnimation()
+                        stopProgressAnimation()
                         showErrorMessage("Exception: " + e.message)
                     }
                 }
@@ -258,13 +258,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startRecognizeAnimation() {
+    private fun startProgressAnimation() {
         val rotation = AnimationUtils.loadAnimation(this, R.anim.rotate)
         rotation.fillAfter = true
         barcodeImgView.startAnimation(rotation)
     }
 
-    private fun stopRecognizeAnimation() {
+    private fun stopProgressAnimation() {
         barcodeImgView.clearAnimation()
     }
 
@@ -276,15 +276,20 @@ class MainActivity : AppCompatActivity() {
 
         applyEncodeParams(genRequest, type)
 
+        startProgressAnimation()
+
         Thread {
             try {
                 val generated = generateApi.generate(genRequest)
                 runOnUiThread {
+                    stopProgressAnimation()
                     val bitmap = BitmapFactory.decodeFile(generated!!.absolutePath)
                     barcodeImgView.setImageBitmap(bitmap)
                 }
             } catch (e: ApiException) {
                 runOnUiThread {
+                    stopProgressAnimation()
+
                     var message = e.message + ": " + e.details
                     if (e.httpCode == 0) {
                         message = "Check ClientId and ClientSecret in ApiClient $message"
@@ -293,6 +298,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 runOnUiThread {
+                    stopProgressAnimation()
                     showErrorMessage("Exception: " + e.message)
                 }
             }
