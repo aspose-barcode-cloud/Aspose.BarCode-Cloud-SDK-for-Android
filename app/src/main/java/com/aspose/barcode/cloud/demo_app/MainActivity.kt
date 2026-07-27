@@ -54,11 +54,19 @@ import com.aspose.barcode.cloud.api.GenerateApi
 import com.aspose.barcode.cloud.api.ScanApi
 import com.aspose.barcode.cloud.model.BarcodeImageFormat
 import com.aspose.barcode.cloud.model.BarcodeImageParams
+import com.aspose.barcode.cloud.model.Code128EncodeMode
+import com.aspose.barcode.cloud.model.Code128Params
+import com.aspose.barcode.cloud.model.ECIEncodings
 import com.aspose.barcode.cloud.model.EncodeBarcodeType
+import com.aspose.barcode.cloud.model.MicroQRVersion
+import com.aspose.barcode.cloud.model.Pdf417EncodeMode
+import com.aspose.barcode.cloud.model.Pdf417ErrorLevel
+import com.aspose.barcode.cloud.model.Pdf417Params
 import com.aspose.barcode.cloud.model.QREncodeMode
 import com.aspose.barcode.cloud.model.QRErrorLevel
 import com.aspose.barcode.cloud.model.QRVersion
 import com.aspose.barcode.cloud.model.QrParams
+import com.aspose.barcode.cloud.model.RectMicroQRVersion
 import com.aspose.barcode.cloud.requests.GenerateRequestWrapper
 import com.aspose.barcode.cloud.requests.ScanMultipartRequestWrapper
 import com.google.android.material.snackbar.Snackbar
@@ -262,14 +270,7 @@ class MainActivity : AppCompatActivity() {
             imageWidth = barcodeImgView.measuredWidth.toFloat()
         }
 
-        if (type == EncodeBarcodeType.QR) {
-            genRequest.qrParams = QrParams().apply {
-                qrEncodeMode = QREncodeMode.AUTO
-                qrErrorLevel = QRErrorLevel.LEVEL_M
-                qrVersion = QRVersion.AUTO
-                qrAspectRatio = 0.75f
-            }
-        }
+        applyEncodeParams(genRequest, type)
 
         Thread {
             try {
@@ -292,6 +293,60 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }.start()
+    }
+
+    /**
+     * Attaches the optional parameter groups supported by [GenerateRequestWrapper].
+     * Each group applies to its own family of barcode types.
+     */
+    private fun applyEncodeParams(request: GenerateRequestWrapper, type: EncodeBarcodeType) {
+        when (type) {
+            EncodeBarcodeType.QR,
+            EncodeBarcodeType.GS1_QR -> request.qrParams = qrParams()
+
+            EncodeBarcodeType.MICRO_QR -> request.qrParams = qrParams().apply {
+                microQRVersion = MicroQRVersion.AUTO
+            }
+
+            EncodeBarcodeType.RECT_MICRO_QR -> request.qrParams = qrParams().apply {
+                rectMicroQrVersion = RectMicroQRVersion.AUTO
+            }
+
+            EncodeBarcodeType.CODE128,
+            EncodeBarcodeType.GS1_CODE128 -> request.code128Params = Code128Params().apply {
+                code128EncodeMode = Code128EncodeMode.AUTO
+            }
+
+            EncodeBarcodeType.PDF417,
+            EncodeBarcodeType.MACRO_PDF417 -> request.pdf417Params = pdf417Params(3.0f)
+
+            EncodeBarcodeType.MICRO_PDF417,
+            EncodeBarcodeType.GS1_MICRO_PDF417 -> request.pdf417Params = pdf417Params(2.0f)
+
+            else -> Unit
+        }
+    }
+
+    private fun qrParams() = QrParams().apply {
+        qrEncodeMode = QREncodeMode.AUTO
+        qrErrorLevel = QRErrorLevel.LEVEL_M
+        qrVersion = QRVersion.AUTO
+        qrECIEncoding = ECIEncodings.UTF8
+        qrAspectRatio = 0.75f
+    }
+
+    /**
+     * @param aspectRatio defined by the standard: 3 to 5 for Pdf417 and MacroPdf417,
+     * 2 to 5 for MicroPdf417.
+     */
+    private fun pdf417Params(aspectRatio: Float) = Pdf417Params().apply {
+        pdf417EncodeMode = Pdf417EncodeMode.AUTO
+        pdf417ErrorLevel = Pdf417ErrorLevel.LEVEL2
+        pdf417ECIEncoding = ECIEncodings.UTF8
+        pdf417AspectRatio = aspectRatio
+        // 0 selects the column and row count automatically.
+        pdf417Columns = 0
+        pdf417Rows = 0
     }
 
     fun onBtnTakePhotoClick(@Suppress("UNUSED_PARAMETER") view: View) {
