@@ -6,12 +6,22 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-android:
+    name: Build Android app
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set up Java 17 for AGP
         uses: actions/setup-java@v5
         with:
@@ -19,7 +29,7 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
-      - uses: sparkfabrik/android-build-action@v1.5.0
+      - uses: sparkfabrik/android-build-action@22a550b5d2dff5538ee6bbc39ba8517fdb3620b3 # v1.5.0
         with:
           project-path: ${{ github.workspace }}
           fastlane-env: "release"
