@@ -1,7 +1,6 @@
 # Android Application for Barcode Processing in the Cloud via REST API
 
 [![Build Android App](https://github.com/aspose-barcode-cloud/Aspose.BarCode-Cloud-SDK-for-Android/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/aspose-barcode-cloud/Aspose.BarCode-Cloud-SDK-for-Android/actions/workflows/build.yml)
-[![zizmor](https://github.com/aspose-barcode-cloud/Aspose.BarCode-Cloud-SDK-for-Android/actions/workflows/zizmor.yml/badge.svg?branch=main)](https://github.com/aspose-barcode-cloud/Aspose.BarCode-Cloud-SDK-for-Android/actions/workflows/zizmor.yml)
 ![API version: 4.0](https://img.shields.io/badge/api-v4.0-lightgrey)
 [![GitHub license](https://img.shields.io/github/license/aspose-barcode-cloud/Aspose.BarCode-Cloud-SDK-for-Android)](https://github.com/aspose-barcode-cloud/Aspose.BarCode-Cloud-SDK-for-Android)
 
